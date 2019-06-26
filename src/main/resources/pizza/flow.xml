@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:flow="http://www.springframework.org/schema/webflow-config"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/webflow-config
+           http://www.springframework.org/schema/webflow-config/spring-webflow-config.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.pizza" />
+     <!--创建流程执行器-->
+    <!-- Executes flows: the entry point into the Spring Web Flow system -->
+    <flow:flow-executor id="flowExecutor" />
+
+    <!--加载流程定义并让流程执行器使用他们,可以注册多个；通过flow-location定义的流程的id为customer-flow,如果不显示的指定id-->
+     <flow:flow-registry id="flowRegistry"  >
+         <flow:flow-location id="customer" path="classpath:pizza/customer-flow.xml"/>
+     </flow:flow-registry>
+
+    <!--Maps request paths to flows in the flowRegistry
+       2、FlowHandlerMapping来帮助dispacherServlet将请求发送给spring web flow,将请求的url匹配到对应的流程上
+       3、如果请求/customer，将会匹配上面的customer流程，响应请求的是FlowHandlerAdapter
+    -->
+    <bean class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping">
+        <property name="flowRegistry" ref="flowRegistry" />
+    </bean>
+
+    <!--Dispatches requests mapped to flows to FlowHandler implementations
+        2、响应请求并处理
+     -->
+    <bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
+        <property name="flowExecutor" ref="flowExecutor" />
+    </bean>
+</beans>
